@@ -1,75 +1,38 @@
 class HomePage {
     /**
-     * Devuelve solo los productos destacados (no categorías) de la home
-     */
-    public async productosDestacados() {
-        const items = await $$('.item-box');
-        const productos = [];
-        for (const item of items) {
-            // Solo agrega el item si contiene un .product-item (es un producto, no una categoría)
-            if (await item.$('.product-item').isExisting()) {
-                productos.push(item);
-            }
-        }
-        return productos;
-    }
-
-    /**
-     * Abre la página principal de nopCommerce
+     * Abre la página principal de OpenCart y espera a que el menú 'Desktops' esté visible
      */
     public async open() {
-        await browser.url('https://demo.nopcommerce.com/');
-    }
+        await browser.url('https://demo.opencart.com/');
 
-    /**
-     * Hace scroll hasta el primer producto destacado para asegurar que esté visible
-     */
-    public async scrollToProductosDestacados() {
-        const productos = await this.productosDestacados();
-        if (productos.length > 0) {
-            await productos[0].scrollIntoView();
-        }
-    }
+        // Validar si aparece el captcha de Cloudflare
+        await browser.pause(1000);
+        const captcha = await $('//p[contains(@class, "spacer-bottom") and contains(text(), "Verifique que usted es un ser humano")]');
+        const isCaptchaPresent = await captcha.isExisting();
+        console.log('¿Captcha presente?:', isCaptchaPresent);
 
-    /**
-     * Hace clic en el primer producto destacado visible en la home
-     */
-    public async clickPrimerProducto() {
-        await this.scrollToProductosDestacados();
-        await browser.waitUntil(
-            async () => {
-                const productos = await this.productosDestacados();
-                return productos.length > 0;
-            },
-            { timeout: 5000, timeoutMsg: 'No se encontraron productos destacados' }
-        );
-        const productos = await this.productosDestacados();
-        const html = await productos[0].getHTML();
-        console.log('HTML primer producto:', html); // Para depuración
-        // Selector corregido:
-        const primerProducto = await productos[0].$('.details .product-title a');
-        await primerProducto.waitForExist({ timeout: 5000 });
-        await primerProducto.click();
-    }
-
-    /**
-     * Hace clic en un producto destacado por su nombre
-     * @param nombre Nombre exacto del producto a buscar
-     */
-    public async clickProductoPorNombre(nombre: string) {
-        await this.scrollToProductosDestacados();
-        const productos = await this.productosDestacados();
-        for (const producto of productos) {
-            const link = await producto.$('.details .product-title a');
-            await link.waitForExist({ timeout: 5000 });
-            const titulo = await link.getText();
-            if (titulo.trim() === nombre.trim()) {
-                await link.click();
-                return;
+        if (isCaptchaPresent) {
+            try {
+                console.log('Captcha detectado, ejecutando robotjs...');
+                const { execSync } = require('child_process');
+                execSync('node robot-auto-click.cjs');
+                console.log('robotjs ejecutado');
+                await browser.pause(2000);
+            } catch (e) {
+                console.error('Error ejecutando robotjs:', e);
             }
+        } else {
+            console.log('No hay captcha, continuando el test normalmente.');
         }
-        throw new Error(`Producto con nombre "${nombre}" no encontrado`);
+
+        // Ahora sí, espera el menú "Desktops" para validar que la home cargó
+        await browser.waitUntil(
+            async () => (await $('a.dropdown-toggle=Desktops')).isDisplayed(),
+            {
+                timeout: 15000,
+                timeoutMsg: 'La home no se cargó correctamente',
+            }
+        );
     }
 }
-
 export default new HomePage();

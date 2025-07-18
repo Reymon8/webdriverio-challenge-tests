@@ -1,11 +1,11 @@
 class ProductoPage {
-    public get nombreProducto() { return $('div.product-name h1'); }
-    public get marca() { return $('div.manufacturer'); }
-    public get codigo() { return $('div.sku span.value'); }
-    public get disponibilidad() { return $('div.stock span.value'); }
-    public get cantidadInput() { return $('input.qty-input'); }
-    public get btnAgregarCarrito() { return $('button.add-to-cart-button'); }
-    public get descripcion() { return $('#product-details-form .overview'); }
+    public get nombreProducto() { return $('h1'); }
+    public get marca() { return $('//li[contains(text(), "Brand")]/a'); }
+    public get codigo() { return $('//li[contains(text(), "Product Code")]'); }
+    public get disponibilidad() { return $('//li[contains(text(), "Availability")]'); }
+    public get cantidadInput() { return $('#input-quantity'); }
+    public get btnAgregarCarrito() { return $('#button-cart'); }
+    public get descripcion() { return $('#tab-description'); }
 }
 
 export default new ProductoPage();
