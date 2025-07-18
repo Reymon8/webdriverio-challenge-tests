@@ -1,3 +1,38 @@
+## 🚀 Guía rápida para clonar y ejecutar el proyecto
+
+1. **Clona el repositorio:**
+   ```bash
+   git clone <URL_DEL_REPOSITORIO>
+   cd webDriveriOChallenge
+   ```
+
+2. **Instala las dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **(Opcional) Instala Allure Commandline para reportes:**
+   ```bash
+   npm install -g allure-commandline --save-dev
+   ```
+
+4. **Actualiza la cookie `cf_clearance` si es necesario:**  
+   (Ver instrucciones al final del README para obtener el valor actualizado de la cookie si aparece el captcha de Cloudflare.)
+
+5. **Ejecuta un caso de prueba individual:**
+   Por ejemplo, para el primer caso:
+   ```bash
+   npx wdio run wdio.conf.js --spec test/specs/01-producto.spec.ts --mochaOpts.grep "CP001"
+   ```
+
+6. **(Opcional) Genera y abre el reporte Allure:**
+   ```bash
+   npx allure generate allure-results --clean -o allure-report
+   npx allure open allure-report
+   ```
+
+---
+
 # WebDriverIO Challenge - OpenCart Demo
 
 ## 📝 Descripción del Challenge
@@ -185,3 +220,5 @@ npx wdio run wdio.conf.js --spec test/specs/04-historial.spec.ts --mochaOpts.gre
 >      5. **Reemplaza el valor de `value`** por el nuevo valor que copiaste.
 >      6. Guarda el archivo y vuelve a ejecutar tus tests.
 >    - Así te aseguras de que la automatización pueda acceder al sitio sin interrupciones. 
+
+--- 
